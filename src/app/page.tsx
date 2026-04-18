@@ -3,13 +3,14 @@
 import React, { useState } from "react";
 import PrimarySidebar from "@/components/PrimarySidebar";
 import SecondarySidebar from "@/components/SecondarySidebar";
-import ImageConfigPanel from "@/components/ImageConfigPanel";
-import ImagePreviewPanel from "@/components/ImagePreviewPanel";
+import ImageWorkspace from "@/components/ImageWorkspace";
+import ImageDetail from "@/components/ImageDetail";
 
 export default function Home() {
   const [activeItem, setActiveItem] = useState("creation");
   const [activeSubItem, setActiveSubItem] = useState("image");
   const [secondarySidebarOpen, setSecondarySidebarOpen] = useState(true);
+  const [detailImageId, setDetailImageId] = useState<string | null>(null);
 
   const handlePrimaryItemClick = (item: string) => {
     setActiveItem(item);
@@ -18,6 +19,21 @@ export default function Home() {
     } else {
       setSecondarySidebarOpen(false);
     }
+  };
+
+  const renderImageContent = () => {
+    if (detailImageId) {
+      return (
+        <ImageDetail
+          imageId={detailImageId}
+          onClose={() => setDetailImageId(null)}
+        />
+      );
+    }
+
+    return (
+      <ImageWorkspace onImageClick={(id: string) => setDetailImageId(id)} />
+    );
   };
 
   return (
@@ -36,24 +52,26 @@ export default function Home() {
       {/* Main Content */}
       <main className="flex-1 flex h-full overflow-hidden">
         {activeItem === "creation" && activeSubItem === "image" ? (
-          <>
-            <ImageConfigPanel />
-            <ImagePreviewPanel />
-          </>
+          renderImageContent()
         ) : (
-          <div className="flex-1 flex items-center justify-center bg-surface/30">
+          <div className="flex-1 flex items-center justify-center" style={{ background: "#f4f6f9" }}>
             <div className="text-center">
-              <div className="w-16 h-16 rounded-2xl bg-surface flex items-center justify-center mx-auto mb-4">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9494a5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <div
+                className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-5"
+                style={{ background: "rgba(10,132,255,0.08)" }}
+              >
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0a84ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.6">
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                   <line x1="3" y1="9" x2="21" y2="9" />
                   <line x1="9" y1="21" x2="9" y2="9" />
                 </svg>
               </div>
-              <h2 className="text-lg font-semibold text-foreground mb-1 capitalize">
+              <h2 className="text-xl font-bold mb-2 capitalize" style={{ color: "#0f172a", letterSpacing: "-0.02em" }}>
                 {activeItem.replace("-", " ")}
               </h2>
-              <p className="text-sm text-text-muted">Select a menu item to get started</p>
+              <p className="text-sm" style={{ color: "#64748b" }}>
+                Select a menu item to get started
+              </p>
             </div>
           </div>
         )}

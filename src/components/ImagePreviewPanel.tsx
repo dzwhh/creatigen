@@ -1,82 +1,120 @@
 "use client";
 
 import React from "react";
+import { Badge } from "@/components/ui/badge";
 
-const placeholderImages = [
-  { id: 1, label: null, span: "col-span-2 row-span-2" },
-  { id: 2, label: "Cozy Hiding Spot", span: "" },
-  { id: 3, label: null, span: "" },
-  { id: 4, label: "Modern Home Aesthetic", span: "" },
-  { id: 5, label: null, span: "" },
-  { id: 6, label: null, span: "" },
-  { id: 7, label: null, span: "" },
-  { id: 8, label: "DURABLE SISAL POSTS", span: "" },
-  { id: 9, label: null, span: "" },
+const imageLabels: Record<number, string> = {
+  2: "Cozy Hiding Spot",
+  4: "Modern Home Aesthetic",
+  8: "DURABLE SISAL POSTS",
+};
+
+const gradients = [
+  "linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%)",
+  "linear-gradient(135deg, #ffe4e6 0%, #fed7aa 100%)",
+  "linear-gradient(135deg, #f5f5f4 0%, #fef3c7 100%)",
+  "linear-gradient(135deg, #ffedd5 0%, #fef9c3 100%)",
+  "linear-gradient(135deg, #fef3c7 0%, #f5f5f4 100%)",
+  "linear-gradient(135deg, #f5f5f4 0%, #fef3c7 100%)",
+  "linear-gradient(135deg, #fef9c3 0%, #ffedd5 100%)",
+  "linear-gradient(135deg, #ffe4e6 0%, #f5f5f4 100%)",
+  "linear-gradient(135deg, #fef3c7 0%, #f5f5f4 100%)",
 ];
 
-const catTowerColors = [
-  "from-amber-100 to-orange-50",
-  "from-rose-50 to-amber-50",
-  "from-stone-100 to-amber-50",
-  "from-orange-50 to-yellow-50",
-  "from-amber-50 to-stone-100",
-  "from-stone-50 to-amber-100",
-  "from-yellow-50 to-orange-50",
-  "from-rose-50 to-stone-100",
-  "from-amber-100 to-stone-50",
-];
+function ImagePlaceholder({ size = 40 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="rgba(180,140,60,0.3)" strokeWidth="1">
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+      <circle cx="8.5" cy="8.5" r="1.5" />
+      <polyline points="21 15 16 10 5 21" />
+    </svg>
+  );
+}
 
 export default function ImagePreviewPanel() {
   return (
-    <div className="flex-1 h-full overflow-y-auto bg-surface/50 p-8">
+    <div className="flex-1 h-full overflow-y-auto p-10" style={{ background: "#f4f6f9" }}>
       <div className="max-w-4xl mx-auto">
         {/* Title */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-3 tracking-tight">
+        <div className="text-center mb-10">
+          <h1
+            className="text-[32px] font-bold mb-4"
+            style={{ color: "#0f172a", letterSpacing: "-0.03em", lineHeight: 1.15 }}
+          >
             AI Listing Images
           </h1>
-          <p className="text-sm text-text-secondary leading-relaxed max-w-lg mx-auto">
+          <p className="text-[15px] leading-relaxed max-w-xl mx-auto" style={{ color: "#64748b" }}>
             Upload product images, AI instantly generates{" "}
-            <span className="font-bold text-foreground">multi-platform compliant</span>{" "}
+            <strong style={{ color: "#0f172a" }}>multi-platform compliant</strong>{" "}
             high-conversion product images
           </p>
         </div>
 
         {/* Image Grid */}
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 gap-4">
           {/* Large Image 01 */}
           <div className="col-span-2 row-span-2 relative group">
-            <div className={`w-full h-full min-h-[320px] rounded-2xl bg-gradient-to-br ${catTowerColors[0]} flex items-center justify-center overflow-hidden`}>
+            <div
+              className="w-full h-full min-h-[360px] rounded-2xl flex items-center justify-center overflow-hidden"
+              style={{
+                background: gradients[0],
+                boxShadow: "0 1px 3px rgba(15,23,42,0.04), 0 8px 32px rgba(15,23,42,0.06)",
+              }}
+            >
               <div className="text-center">
-                <svg className="mx-auto mb-2 text-amber-300/60" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <polyline points="21 15 16 10 5 21" />
-                </svg>
-                <p className="text-xs text-amber-400/60">Product Image</p>
+                <ImagePlaceholder size={72} />
+                <p className="text-xs mt-3" style={{ color: "rgba(180,140,60,0.5)" }}>
+                  Product Image
+                </p>
               </div>
             </div>
-            <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-xs font-bold text-foreground w-7 h-7 rounded-lg flex items-center justify-center shadow-sm">
+            <Badge
+              variant="secondary"
+              className="absolute top-3 left-3 rounded-lg px-2.5 py-1 text-xs font-bold"
+              style={{
+                background: "rgba(255,255,255,0.92)",
+                backdropFilter: "blur(8px)",
+                color: "#0f172a",
+                boxShadow: "0 1px 3px rgba(15,23,42,0.08)",
+              }}
+            >
               01
-            </span>
+            </Badge>
           </div>
 
           {/* Images 02-05 */}
           {[2, 3, 4, 5].map((num) => (
             <div key={num} className="relative group">
-              <div className={`w-full aspect-square rounded-2xl bg-gradient-to-br ${catTowerColors[num - 1]} flex items-center justify-center overflow-hidden`}>
-                <svg className="text-amber-300/40" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <polyline points="21 15 16 10 5 21" />
-                </svg>
+              <div
+                className="w-full aspect-square rounded-2xl flex items-center justify-center overflow-hidden"
+                style={{
+                  background: gradients[num - 1],
+                  boxShadow: "0 1px 2px rgba(15,23,42,0.04)",
+                }}
+              >
+                <ImagePlaceholder size={36} />
               </div>
-              <span className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-[10px] font-bold text-foreground w-6 h-6 rounded-md flex items-center justify-center shadow-sm">
+              <Badge
+                variant="secondary"
+                className="absolute top-2.5 left-2.5 rounded-md px-2 py-0.5 text-[10px] font-bold"
+                style={{
+                  background: "rgba(255,255,255,0.92)",
+                  backdropFilter: "blur(8px)",
+                  color: "#0f172a",
+                  boxShadow: "0 1px 2px rgba(15,23,42,0.06)",
+                }}
+              >
                 {String(num).padStart(2, "0")}
-              </span>
-              {placeholderImages[num - 1].label && (
-                <span className="absolute bottom-2 left-2 right-2 bg-black/40 backdrop-blur-sm text-white text-[10px] font-medium px-2 py-1 rounded-md text-center truncate">
-                  {placeholderImages[num - 1].label}
+              </Badge>
+              {imageLabels[num] && (
+                <span
+                  className="absolute bottom-2.5 left-2.5 right-2.5 text-white text-[10px] font-semibold px-2.5 py-1.5 rounded-lg text-center truncate"
+                  style={{
+                    background: "rgba(15,23,42,0.5)",
+                    backdropFilter: "blur(8px)",
+                  }}
+                >
+                  {imageLabels[num]}
                 </span>
               )}
             </div>
@@ -85,19 +123,36 @@ export default function ImagePreviewPanel() {
           {/* Images 06-09 */}
           {[6, 7, 8, 9].map((num) => (
             <div key={num} className="relative group">
-              <div className={`w-full aspect-square rounded-2xl bg-gradient-to-br ${catTowerColors[num - 1]} flex items-center justify-center overflow-hidden`}>
-                <svg className="text-amber-300/40" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <polyline points="21 15 16 10 5 21" />
-                </svg>
+              <div
+                className="w-full aspect-square rounded-2xl flex items-center justify-center overflow-hidden"
+                style={{
+                  background: gradients[num - 1],
+                  boxShadow: "0 1px 2px rgba(15,23,42,0.04)",
+                }}
+              >
+                <ImagePlaceholder size={36} />
               </div>
-              <span className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-[10px] font-bold text-foreground w-6 h-6 rounded-md flex items-center justify-center shadow-sm">
+              <Badge
+                variant="secondary"
+                className="absolute top-2.5 left-2.5 rounded-md px-2 py-0.5 text-[10px] font-bold"
+                style={{
+                  background: "rgba(255,255,255,0.92)",
+                  backdropFilter: "blur(8px)",
+                  color: "#0f172a",
+                  boxShadow: "0 1px 2px rgba(15,23,42,0.06)",
+                }}
+              >
                 {String(num).padStart(2, "0")}
-              </span>
-              {placeholderImages[num - 1].label && (
-                <span className="absolute bottom-2 left-2 right-2 bg-black/40 backdrop-blur-sm text-white text-[10px] font-medium px-2 py-1 rounded-md text-center truncate">
-                  {placeholderImages[num - 1].label}
+              </Badge>
+              {imageLabels[num] && (
+                <span
+                  className="absolute bottom-2.5 left-2.5 right-2.5 text-white text-[10px] font-semibold px-2.5 py-1.5 rounded-lg text-center truncate"
+                  style={{
+                    background: "rgba(15,23,42,0.5)",
+                    backdropFilter: "blur(8px)",
+                  }}
+                >
+                  {imageLabels[num]}
                 </span>
               )}
             </div>

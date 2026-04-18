@@ -11,6 +11,7 @@ export default function Home() {
   const [activeSubItem, setActiveSubItem] = useState("image");
   const [secondarySidebarOpen, setSecondarySidebarOpen] = useState(true);
   const [detailImageId, setDetailImageId] = useState<string | null>(null);
+  const [detailTaskImages, setDetailTaskImages] = useState<{ id: string; src: string }[]>([]);
 
   const handlePrimaryItemClick = (item: string) => {
     setActiveItem(item);
@@ -26,13 +27,14 @@ export default function Home() {
       return (
         <ImageDetail
           imageId={detailImageId}
+          taskImages={detailTaskImages}
           onClose={() => setDetailImageId(null)}
         />
       );
     }
 
     return (
-      <ImageWorkspace onImageClick={(id: string) => setDetailImageId(id)} />
+      <ImageWorkspace onImageClick={(id: string, taskImages?: { id: string; src: string }[]) => { setDetailImageId(id); setDetailTaskImages(taskImages || []); }} />
     );
   };
 

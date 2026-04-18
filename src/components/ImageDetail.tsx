@@ -6,23 +6,13 @@ import { Button } from "@/components/ui/button";
 
 interface ImageDetailProps {
   imageId: string;
+  taskImages: { id: string; src: string }[];
   onClose: () => void;
 }
 
-const allThumbnails = [
-  { id: "img-1", src: "/img/excel_images/Collage示例/image_001.png" },
-  { id: "img-2", src: "/img/excel_images/Collage示例/image_002.png" },
-  { id: "img-3", src: "/img/excel_images/Collage示例/image_003.png" },
-  { id: "img-4", src: "/img/excel_images/Collage示例/image_004.png" },
-  { id: "img-5", src: "/img/excel_images/Collage示例/image_005.png" },
-  { id: "img-6", src: "/img/excel_images/Collage示例/image_006.png" },
-  { id: "img-7", src: "/img/excel_images/Collage示例/image_007.png" },
-  { id: "img-8", src: "/img/excel_images/Collage示例/image_008.png" },
-];
-
-export default function ImageDetail({ imageId, onClose }: ImageDetailProps) {
+export default function ImageDetail({ imageId, taskImages, onClose }: ImageDetailProps) {
   const [selectedThumb, setSelectedThumb] = useState(imageId);
-  const currentThumb = allThumbnails.find((t) => t.id === selectedThumb) || allThumbnails[0];
+  const currentThumb = taskImages.find((t) => t.id === selectedThumb) || taskImages[0];
 
   return (
     <div className="flex-1 h-full flex flex-col overflow-hidden" style={{ background: "#f4f6f9" }}>
@@ -72,17 +62,40 @@ export default function ImageDetail({ imageId, onClose }: ImageDetailProps) {
               className="w-full h-full object-cover"
             />
           </div>
-          <Button
-            variant="outline"
-            className="mt-5 h-11 px-6 rounded-xl text-sm font-medium gap-2"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            Download original
-          </Button>
+          <div className="flex items-center gap-3 mt-5">
+            <Button
+              variant="outline"
+              className="h-11 px-5 rounded-xl text-sm font-medium gap-2"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download
+            </Button>
+            <Button
+              variant="outline"
+              className="h-11 px-5 rounded-xl text-sm font-medium gap-2"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                <polyline points="17 21 17 13 7 13 7 21"/>
+                <polyline points="7 3 7 8 15 8"/>
+              </svg>
+              Save to Assets
+            </Button>
+            <Button
+              className="h-11 px-5 rounded-xl text-sm font-medium gap-2 text-white"
+              style={{ background: "linear-gradient(135deg, #6366f1, #0ea5e9)" }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+              Edit
+            </Button>
+          </div>
         </div>
 
         {/* Right: Details panel */}
@@ -182,7 +195,7 @@ export default function ImageDetail({ imageId, onClose }: ImageDetailProps) {
             borderLeft: "1px solid rgba(15,23,42,0.06)",
           }}
         >
-          {allThumbnails.map((thumb) => (
+          {taskImages.map((thumb) => (
             <button
               key={thumb.id}
               onClick={() => setSelectedThumb(thumb.id)}

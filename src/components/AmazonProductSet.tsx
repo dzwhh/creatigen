@@ -8,10 +8,10 @@ const mockTasks = [
   {
     id: "task-1",
     images: [
-      { id: "img-1", src: "/img/excel_images/Collage示例/image_001.png" },
-      { id: "img-2", src: "/img/excel_images/Collage示例/image_002.png" },
-      { id: "img-3", src: "/img/excel_images/Collage示例/image_003.png" },
-      { id: "img-4", src: "/img/excel_images/Collage示例/image_004.png" },
+      { id: "img-1", src: "/img/excel_images/Collage示例/Western fashion/image_001.png" },
+      { id: "img-2", src: "/img/excel_images/Collage示例/Western fashion/image_002.png" },
+      { id: "img-3", src: "/img/excel_images/Collage示例/Western fashion/image_003.png" },
+      { id: "img-4", src: "/img/excel_images/Collage示例/Daily/image_004.png" },
     ],
     meta: {
       time: "5 minutes ago",
@@ -25,10 +25,10 @@ const mockTasks = [
   {
     id: "task-2",
     images: [
-      { id: "img-5", src: "/img/excel_images/Collage示例/image_005.png" },
-      { id: "img-6", src: "/img/excel_images/Collage示例/image_006.png" },
-      { id: "img-7", src: "/img/excel_images/Collage示例/image_007.png" },
-      { id: "img-8", src: "/img/excel_images/Collage示例/image_008.png" },
+      { id: "img-5", src: "/img/excel_images/Collage示例/Daily/image_005.png" },
+      { id: "img-6", src: "/img/excel_images/Collage示例/Daily/image_006.png" },
+      { id: "img-7", src: "/img/excel_images/Collage示例/Daily/image_007.png" },
+      { id: "img-8", src: "/img/excel_images/Collage示例/Daily/image_008.png" },
     ],
     meta: {
       time: "7 minutes ago",
@@ -42,7 +42,7 @@ const mockTasks = [
 ];
 
 interface AmazonProductSetProps {
-  onImageClick: (imageId: string) => void;
+  onImageClick: (imageId: string, taskImages?: { id: string; src: string }[]) => void;
 }
 
 const resolutions = ["1K", "2K", "4K"];
@@ -57,13 +57,6 @@ const ratios = [
 ];
 const imageCounts = [1, 2, 3, 4];
 
-// Prompt templates for preset styles
-const presetPromptTemplates: Record<string, string> = {
-  "western fashion": "User-generated content style photography from {img1} — product in real-world use by a naturally attractive, relatable person matching the target demographic. CRITICAL: preserve the product's exact shape, color, texture, logo, and every detail — do NOT alter or reimagine the product. Natural ambient lighting, candid genuine feel, authentic everyday setting, slightly imperfect to feel real. Use {img2} as person appearance and usage scenario reference.",
-  daily: "Casual everyday lifestyle photography from {img1} — product styled in a relaxed, approachable setting with natural daylight. CRITICAL: preserve the product's exact design, color, pattern, fabric, cut, and every detail — do NOT alter or reimagine the product. Authentic candid vibe, real-life backdrop, relatable model. Use {img2} as style and scene reference.",
-  "formal/work commute": "Professional workplace photography from {img1} — product worn in a polished office or commute setting. CRITICAL: preserve the product's exact design, color, pattern, fabric, cut, and every detail — do NOT alter or reimagine the product. Clean modern environment, confident posture, business-appropriate styling. Use {img2} as appearance and setting reference.",
-  vacation: "Travel lifestyle photography from {img1} — product in a scenic vacation destination with warm natural light. CRITICAL: preserve the product's exact design, color, pattern, fabric, cut, and every detail — do NOT alter or reimagine the product. Relaxed resort or beach vibe, golden hour atmosphere. Use {img2} as mood and location reference.",
-};
 // Style reference images by category (from img/excel_images/Collage示例 subfolders)
 const styleRefImages: Record<string, { name: string; src: string }[]> = {
   "Western Fashion": [
@@ -96,6 +89,23 @@ const styleRefImages: Record<string, { name: string; src: string }[]> = {
   ],
 };
 const styleCategories = ["All", "Western Fashion", "Daily", "Formal/Work Commute", "Vacation"];
+
+// Model reference images (European/American fashion models)
+const modelRefImages: Record<string, { name: string; src: string }[]> = {
+  "Nesrin": [
+    ...Array.from({ length: 22 }, (_, i) => ({ name: `Nesrin ${String(i + 1).padStart(2, "0")}`, src: `/img/excel_images/Nesrin（副本）/image_${String(i + 1).padStart(3, "0")}.png` })),
+    ...Array.from({ length: 6 }, (_, i) => ({ name: `Nesrin ${i + 23}`, src: `/img/excel_images/Nesrin（副本）/image_${String(i + 23).padStart(3, "0")}.jpg` })),
+  ],
+  "Nicole": [
+    ...[1,2,3,4,5,6,7,8,9].map(i => ({ name: `Nicole ${String(i).padStart(2, "0")}`, src: `/img/excel_images/Nicole（副本）/image_${String(i).padStart(3, "0")}.png` })),
+    ...[10,11,12].map(i => ({ name: `Nicole ${i}`, src: `/img/excel_images/Nicole（副本）/image_${String(i).padStart(3, "0")}.jpg` })),
+    ...[13,14].map(i => ({ name: `Nicole ${i}`, src: `/img/excel_images/Nicole（副本）/image_${String(i).padStart(3, "0")}.png` })),
+    ...[15,16,17,18,19,20,21,22,23,24,25].map(i => ({ name: `Nicole ${i}`, src: `/img/excel_images/Nicole（副本）/image_${String(i).padStart(3, "0")}.jpg` })),
+    ...[26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54].map(i => ({ name: `Nicole ${i}`, src: `/img/excel_images/Nicole（副本）/image_${String(i).padStart(3, "0")}.png` })),
+    ...[55,56,57,58,59,60,61,62,63,64].map(i => ({ name: `Nicole ${i}`, src: `/img/excel_images/Nicole（副本）/image_${String(i).padStart(3, "0")}.jpg` })),
+  ],
+};
+const modelCategories = ["All", ...Object.keys(modelRefImages)];
 
 // Product images by style category (from img/products subfolders)
 const productRefImages: Record<string, { name: string; src: string; category: string }[]> = {
@@ -183,99 +193,201 @@ function generateAiCombo(styleItems: { name: string; src: string; category: stri
   return combo;
 }
 
-// Collage presets mapped to categories and real images
-const collagePresets: Record<string, { name: string; src: string }[]> = {
-  "western fashion": [
-    { name: "Western Chic Outfit", src: "/img/excel_images/Collage示例/image_001.png" },
-    { name: "Western Fashion Inspo", src: "/img/excel_images/Collage示例/image_002.png" },
-    { name: "Western Nomadic", src: "/img/excel_images/Collage示例/image_003.png" },
-    { name: "Boho Western", src: "/img/excel_images/Collage示例/image_004.png" },
-    { name: "Rodeo Style", src: "/img/excel_images/Collage示例/image_005.png" },
-  ],
-  daily: [
-    { name: "Spring Outfit Inspo", src: "/img/excel_images/Collage示例/image_006.png" },
-    { name: "Casual Weekend", src: "/img/excel_images/Collage示例/image_007.png" },
-    { name: "Everyday Basics", src: "/img/excel_images/Collage示例/image_008.png" },
-    { name: "Street Style", src: "/img/excel_images/Collage示例/image_009.png" },
-    { name: "Minimalist Look", src: "/img/excel_images/Collage示例/image_010.png" },
-  ],
-  "formal/work commute": [
-    { name: "Office Chic", src: "/img/excel_images/Collage示例/image_011.png" },
-    { name: "Business Casual", src: "/img/excel_images/Collage示例/image_012.png" },
-    { name: "Power Suit", src: "/img/excel_images/Collage示例/image_013.png" },
-    { name: "Commute Ready", src: "/img/excel_images/Collage示例/image_014.png" },
-    { name: "Smart Elegance", src: "/img/excel_images/Collage示例/image_015.png" },
-  ],
-  vacation: [
-    { name: "Beach Vibes", src: "/img/excel_images/Collage示例/image_016.png" },
-    { name: "Resort Wear", src: "/img/excel_images/Collage示例/image_017.png" },
-    { name: "Tropical Getaway", src: "/img/excel_images/Collage示例/image_018.png" },
-    { name: "Summer Holiday", src: "/img/excel_images/Collage示例/image_019.png" },
-    { name: "Travel Essentials", src: "/img/excel_images/Collage示例/image_020.png" },
-  ],
-};
+// Preset Templates: complete creation blueprints
+interface PresetTemplate {
+  id: string;
+  name: string;
+  cover: string;           // preview thumbnail
+  style: string;           // Western Fashion / Daily / ...
+  season: string;          // Spring-Summer / Autumn-Winter / All Season
+  blogger: string;         // Street Style / Minimalist / Luxury / ...
+  prompt: string;          // full prompt with {product} and {ref} placeholders
+  refImages: string[];     // default style reference images
+  defaultProducts: { label: string; src: string }[];  // default product images (user can swap)
+}
 
-// My Presets: product fashion images by category
-const myPresetsData: Record<string, { name: string; src: string }[]> = {
-  tops: [
-    { name: "Blouse", src: "/img/excel_images/Product library Fashion/image_001.jpg" },
-    { name: "Crop Top", src: "/img/excel_images/Product library Fashion/image_002.jpg" },
-    { name: "T-Shirt", src: "/img/excel_images/Product library Fashion/image_003.jpg" },
-    { name: "Tank Top", src: "/img/excel_images/Product library Fashion/image_004.jpg" },
-    { name: "Knit Sweater", src: "/img/excel_images/Product library Fashion/image_005.jpg" },
-    { name: "Cardigan", src: "/img/excel_images/Product library Fashion/image_006.jpg" },
-    { name: "Hoodie", src: "/img/excel_images/Product library Fashion/image_007.jpg" },
-  ],
-  bottoms: [
-    { name: "Jeans", src: "/img/excel_images/Product library Fashion/image_008.jpg" },
-    { name: "Mini Skirt", src: "/img/excel_images/Product library Fashion/image_009.jpg" },
-    { name: "Wide Leg Pants", src: "/img/excel_images/Product library Fashion/image_010.jpg" },
-    { name: "Shorts", src: "/img/excel_images/Product library Fashion/image_011.jpg" },
-    { name: "Maxi Skirt", src: "/img/excel_images/Product library Fashion/image_012.jpg" },
-    { name: "Leggings", src: "/img/excel_images/Product library Fashion/image_013.jpg" },
-    { name: "Cargo Pants", src: "/img/excel_images/Product library Fashion/image_014.jpg" },
-  ],
-  dresses: [
-    { name: "Maxi Dress", src: "/img/excel_images/Product library Fashion/image_015.jpg" },
-    { name: "Midi Dress", src: "/img/excel_images/Product library Fashion/image_016.jpg" },
-    { name: "Mini Dress", src: "/img/excel_images/Product library Fashion/image_017.jpg" },
-    { name: "Bodycon", src: "/img/excel_images/Product library Fashion/image_018.jpg" },
-    { name: "Sundress", src: "/img/excel_images/Product library Fashion/image_019.jpg" },
-    { name: "Wrap Dress", src: "/img/excel_images/Product library Fashion/image_020.jpg" },
-    { name: "Shirt Dress", src: "/img/excel_images/Product library Fashion/image_021.jpg" },
-  ],
-  outerwear: [
-    { name: "Denim Jacket", src: "/img/excel_images/Product library Fashion/image_022.jpg" },
-    { name: "Blazer", src: "/img/excel_images/Product library Fashion/image_023.jpg" },
-    { name: "Trench Coat", src: "/img/excel_images/Product library Fashion/image_024.jpg" },
-    { name: "Leather Jacket", src: "/img/excel_images/Product library Fashion/image_025.jpg" },
-    { name: "Vest", src: "/img/excel_images/Product library Fashion/image_026.jpg" },
-    { name: "Puffer", src: "/img/excel_images/Product library Fashion/image_027.jpg" },
-    { name: "Windbreaker", src: "/img/excel_images/Product library Fashion/image_028.jpg" },
-  ],
-  accessories: [
-    { name: "Hat", src: "/img/excel_images/Product library Fashion/image_029.jpg" },
-    { name: "Belt", src: "/img/excel_images/Product library Fashion/image_030.jpg" },
-    { name: "Bag", src: "/img/excel_images/Product library Fashion/image_031.jpg" },
-    { name: "Boots", src: "/img/excel_images/Product library Fashion/image_032.jpg" },
-    { name: "Earrings", src: "/img/excel_images/Product library Fashion/image_033.jpg" },
-    { name: "Sunglasses", src: "/img/excel_images/Product library Fashion/image_034.jpg" },
-    { name: "Scarf", src: "/img/excel_images/Product library Fashion/image_035.jpg" },
-  ],
-};
-const myPresetsCategories = ["All", "Tops", "Bottoms", "Dresses", "Outerwear", "Accessories"];
+const presetTemplates: PresetTemplate[] = [
+  // ─── Western Fashion ───
+  {
+    id: "wf-street-aw",
+    name: "Western Street Blogger",
+    cover: "/img/excel_images/Collage示例/Western fashion/image_001.png",
+    style: "Western Fashion", season: "Autumn-Winter", blogger: "Street Style",
+    prompt: "User-generated content style photography — Western street fashion look with layered outerwear and boots. CRITICAL: preserve the product's exact shape, color, texture, logo, and every detail. Natural ambient lighting, candid genuine feel, urban backdrop with vintage western elements. Use {ref} as style reference and {product} as featured product.",
+    refImages: ["/img/excel_images/Collage示例/Western fashion/image_001.png", "/img/excel_images/Collage示例/Western fashion/image_002.png"],
+    defaultProducts: [
+      { label: "Ankle Boots", src: "/img/products/Western fashion/Ankleboots_001.jpeg" },
+      { label: "Vest", src: "/img/products/Western fashion/Vest_001.jpeg" },
+      { label: "Necklace", src: "/img/products/Western fashion/Necklace_001.jpeg" },
+    ],
+  },
+  {
+    id: "wf-boho-ss",
+    name: "Boho Western Summer",
+    cover: "/img/excel_images/Collage示例/Western fashion/image_002.png",
+    style: "Western Fashion", season: "Spring-Summer", blogger: "Bohemian",
+    prompt: "Bohemian western summer editorial — flowing fabrics and leather accessories in golden hour light. CRITICAL: preserve the product's exact design, color, pattern, fabric, cut. Warm desert tones, relaxed nomadic vibe, outdoor setting with natural textures. Use {ref} as style reference and {product} as featured product.",
+    refImages: ["/img/excel_images/Collage示例/Western fashion/image_002.png", "/img/excel_images/Collage示例/Western fashion/image_003.png"],
+    defaultProducts: [
+      { label: "Dress", src: "/img/products/Western fashion/Dress_001.jpeg" },
+      { label: "Long Boots", src: "/img/products/Western fashion/LongBoots_001.jpeg" },
+      { label: "Scarf", src: "/img/products/Western fashion/Scarf_001.jpeg" },
+    ],
+  },
+  {
+    id: "wf-luxury-aw",
+    name: "Western Luxe Editorial",
+    cover: "/img/excel_images/Collage示例/Western fashion/image_003.png",
+    style: "Western Fashion", season: "Autumn-Winter", blogger: "Luxury",
+    prompt: "High-end western fashion editorial — premium leather, structured silhouettes, sophisticated color palette. CRITICAL: preserve the product's exact shape, color, texture, logo, and every detail. Studio-quality lighting, editorial composition, luxurious backdrop. Use {ref} as style reference and {product} as featured product.",
+    refImages: ["/img/excel_images/Collage示例/Western fashion/image_003.png"],
+    defaultProducts: [
+      { label: "Long Boots", src: "/img/products/Western fashion/LongBoots_002.jpeg" },
+      { label: "Handbag", src: "/img/products/Western fashion/Handbag_001.jpeg" },
+      { label: "Belt", src: "/img/products/Western fashion/Belt_001.jpeg" },
+    ],
+  },
+  // ─── Daily ───
+  {
+    id: "dl-minimal-ss",
+    name: "Minimalist Daily",
+    cover: "/img/excel_images/Collage示例/Daily/image_004.png",
+    style: "Daily", season: "Spring-Summer", blogger: "Minimalist",
+    prompt: "Clean minimalist everyday look — neutral tones, simple silhouettes, effortless styling. CRITICAL: preserve the product's exact design, color, pattern, fabric, cut. Soft natural daylight, airy indoor setting, less-is-more aesthetic. Use {ref} as style reference and {product} as featured product.",
+    refImages: ["/img/excel_images/Collage示例/Daily/image_004.png", "/img/excel_images/Collage示例/Daily/image_005.png"],
+    defaultProducts: [
+      { label: "Top", src: "/img/products/Daily/Top_001.jpeg" },
+      { label: "Pants", src: "/img/products/Daily/Pants_001.jpeg" },
+      { label: "Flats", src: "/img/products/Daily/Flats_001.jpeg" },
+    ],
+  },
+  {
+    id: "dl-street-as",
+    name: "Street Casual",
+    cover: "/img/excel_images/Collage示例/Daily/image_006.png",
+    style: "Daily", season: "All Season", blogger: "Street Style",
+    prompt: "Urban street casual photography — relaxed fit, sneakers, crossbody bags, candid walking shot. CRITICAL: preserve the product's exact design, color, pattern, fabric, cut. City backdrop, authentic vibe, natural ambient light. Use {ref} as style reference and {product} as featured product.",
+    refImages: ["/img/excel_images/Collage示例/Daily/image_006.png", "/img/excel_images/Collage示例/Daily/image_007.png"],
+    defaultProducts: [
+      { label: "Top", src: "/img/products/Daily/Top_002.jpeg" },
+      { label: "Pants", src: "/img/products/Daily/Pants_003.jpeg" },
+      { label: "Sneaker", src: "/img/products/Daily/Sneaker_001.jpeg" },
+      { label: "Crossbody Bag", src: "/img/products/Daily/Crossbodybag_001.jpeg" },
+    ],
+  },
+  {
+    id: "dl-sporty-ss",
+    name: "Sporty Chic",
+    cover: "/img/excel_images/Collage示例/Daily/image_008.png",
+    style: "Daily", season: "Spring-Summer", blogger: "Sporty",
+    prompt: "Sporty chic lifestyle photography — athleisure meets fashion, dynamic pose, vibrant energy. CRITICAL: preserve the product's exact design, color, pattern, fabric, cut. Outdoor park or gym setting, bright natural light, active lifestyle vibe. Use {ref} as style reference and {product} as featured product.",
+    refImages: ["/img/excel_images/Collage示例/Daily/image_008.png"],
+    defaultProducts: [
+      { label: "Top", src: "/img/products/Daily/Top_003.jpeg" },
+      { label: "Pants", src: "/img/products/Daily/Pants_005.jpeg" },
+      { label: "Sneaker", src: "/img/products/Daily/Sneaker_001.jpeg" },
+    ],
+  },
+  {
+    id: "dl-cozy-aw",
+    name: "Cozy Weekend",
+    cover: "/img/excel_images/Collage示例/Daily/image_009.png",
+    style: "Daily", season: "Autumn-Winter", blogger: "Minimalist",
+    prompt: "Cozy weekend outfit photography — warm knitwear, soft textures, relaxed at-home or café setting. CRITICAL: preserve the product's exact design, color, pattern, fabric, cut. Warm indoor lighting, hygge atmosphere, inviting and comfortable. Use {ref} as style reference and {product} as featured product.",
+    refImages: ["/img/excel_images/Collage示例/Daily/image_009.png", "/img/excel_images/Collage示例/Daily/image_010.png"],
+    defaultProducts: [
+      { label: "Top", src: "/img/products/Daily/Top_001.jpeg" },
+      { label: "Scarf", src: "/img/products/Daily/Scarf_001.jpeg" },
+      { label: "Handbag", src: "/img/products/Daily/Handbag_001.jpeg" },
+    ],
+  },
+  // ─── Formal / Work Commute ───
+  {
+    id: "fw-office-as",
+    name: "Office Power Look",
+    cover: "/img/excel_images/Collage示例/Formal&Work commute/image_014.png",
+    style: "Formal/Work Commute", season: "All Season", blogger: "Minimalist",
+    prompt: "Professional office photography — tailored pieces, structured handbag, polished accessories. CRITICAL: preserve the product's exact design, color, pattern, fabric, cut. Modern office interior, clean lines, confident posture. Use {ref} as style reference and {product} as featured product.",
+    refImages: ["/img/excel_images/Collage示例/Formal&Work commute/image_014.png"],
+    defaultProducts: [
+      { label: "Top", src: "/img/products/Formal&Work commute/Top_001.jpeg" },
+      { label: "Pants", src: "/img/products/Formal&Work commute/Pants_001.jpeg" },
+      { label: "Handbag", src: "/img/products/Formal&Work commute/Handbag_001.jpeg" },
+      { label: "Watch", src: "/img/products/Formal&Work commute/Watch_001.jpeg" },
+    ],
+  },
+  {
+    id: "fw-commute-ss",
+    name: "Smart Commute",
+    cover: "/img/excel_images/Collage示例/Formal&Work commute/image_015.png",
+    style: "Formal/Work Commute", season: "Spring-Summer", blogger: "Street Style",
+    prompt: "Smart commute look — business casual meets street style, walking in urban environment. CRITICAL: preserve the product's exact design, color, pattern, fabric, cut. City streets, morning light, dynamic movement feel. Use {ref} as style reference and {product} as featured product.",
+    refImages: ["/img/excel_images/Collage示例/Formal&Work commute/image_015.png"],
+    defaultProducts: [
+      { label: "Loafers", src: "/img/products/Formal&Work commute/Loafers_001.jpeg" },
+      { label: "Handbag", src: "/img/products/Formal&Work commute/Handbag_002.jpeg" },
+      { label: "Necklace", src: "/img/products/Formal&Work commute/Necklace_001.jpeg" },
+    ],
+  },
+  // ─── Vacation ───
+  {
+    id: "vc-beach-ss",
+    name: "Beach Resort",
+    cover: "/img/excel_images/Collage示例/Vacation/image_016.png",
+    style: "Vacation", season: "Spring-Summer", blogger: "Bohemian",
+    prompt: "Beach resort lifestyle photography — swimsuit or light dress, sandy tones, ocean backdrop. CRITICAL: preserve the product's exact design, color, pattern, fabric, cut. Golden hour on beach, relaxed vacation mood, warm tropical palette. Use {ref} as style reference and {product} as featured product.",
+    refImages: ["/img/excel_images/Collage示例/Vacation/image_016.png", "/img/excel_images/Collage示例/Vacation/image_017.png"],
+    defaultProducts: [
+      { label: "Camisole", src: "/img/products/Vacation/Camisole_001.jpeg" },
+      { label: "Flats", src: "/img/products/Vacation/Flats_001.jpeg" },
+      { label: "Handbag", src: "/img/products/Vacation/Handbag_001.jpeg" },
+    ],
+  },
+  {
+    id: "vc-tropical-ss",
+    name: "Tropical Getaway",
+    cover: "/img/excel_images/Collage示例/Vacation/image_018.png",
+    style: "Vacation", season: "Spring-Summer", blogger: "Luxury",
+    prompt: "Tropical luxury getaway — bold prints, resort wear, lush greenery background. CRITICAL: preserve the product's exact design, color, pattern, fabric, cut. Exotic location, saturated colors, editorial travel magazine feel. Use {ref} as style reference and {product} as featured product.",
+    refImages: ["/img/excel_images/Collage示例/Vacation/image_018.png", "/img/excel_images/Collage示例/Vacation/image_019.png"],
+    defaultProducts: [
+      { label: "Swimsuit", src: "/img/products/Vacation/swimsuit_001.jpeg" },
+      { label: "Glasses", src: "/img/products/Vacation/Glasses_001.jpeg" },
+      { label: "Pants", src: "/img/products/Vacation/Pants_001.jpeg" },
+    ],
+  },
+  {
+    id: "vc-holiday-as",
+    name: "Summer Holiday",
+    cover: "/img/excel_images/Collage示例/Vacation/image_020.png",
+    style: "Vacation", season: "All Season", blogger: "Street Style",
+    prompt: "Summer holiday casual — easy breezy outfit, exploring local markets or cafés. CRITICAL: preserve the product's exact design, color, pattern, fabric, cut. Warm afternoon light, authentic travel scenery, spontaneous candid energy. Use {ref} as style reference and {product} as featured product.",
+    refImages: ["/img/excel_images/Collage示例/Vacation/image_020.png"],
+    defaultProducts: [
+      { label: "Camisole", src: "/img/products/Vacation/Camisole_002.jpeg" },
+      { label: "Pants", src: "/img/products/Vacation/Pants_002.jpeg" },
+      { label: "Glasses", src: "/img/products/Vacation/Glasses_002.jpeg" },
+    ],
+  },
+];
+
+const presetStyles = ["All", ...Array.from(new Set(presetTemplates.map(t => t.style)))];
+const presetSeasons = ["All", ...Array.from(new Set(presetTemplates.map(t => t.season)))];
+const presetBloggers = ["All", ...Array.from(new Set(presetTemplates.map(t => t.blogger)))];
 
 export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps) {
   const [activePopover, setActivePopover] = useState<string | null>(null);
   const [selectedRes, setSelectedRes] = useState("1K");
   const [selectedRatio, setSelectedRatio] = useState("4:3");
   const [selectedCount, setSelectedCount] = useState(1);
-  const [presetsTab, setPresetsTab] = useState("collage");
-  const [presetCategory, setPresetCategory] = useState("all");
-  const [myPresetsCategory, setMyPresetsCategory] = useState("all");
+  const [presetStyleFilter, setPresetStyleFilter] = useState("All");
+  const [presetSeasonFilter, setPresetSeasonFilter] = useState("All");
+  const [presetBloggerFilter, setPresetBloggerFilter] = useState("All");
+  const [expandedPreset, setExpandedPreset] = useState<string | null>(null);
   const [showRefModal, setShowRefModal] = useState(false);
   const [refModalTab, setRefModalTab] = useState("upload");
   const [styleFilterCat, setStyleFilterCat] = useState("All");
+  const [modelFilterCat, setModelFilterCat] = useState("All");
   const [productStyleFilter, setProductStyleFilter] = useState("All");
   const [productCatFilter, setProductCatFilter] = useState("All");
   const [aiComboResults, setAiComboResults] = useState<Record<string, { slot: string; item: { name: string; src: string; category: string } }[]> | null>(null);
@@ -428,21 +540,25 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
     setShowAtMenu(false);
   }, [uploadedRefs]);
 
-  // Apply a preset: fill refs + prompt with image chips
-  const applyPreset = useCallback((item: { name: string; src: string }, category: string) => {
-    const newRefs = uploadedRefs.includes(item.src) ? [...uploadedRefs] : [...uploadedRefs, item.src].slice(0, 5);
-    setUploadedRefs(newRefs);
-    const template = presetPromptTemplates[category] || presetPromptTemplates["daily"];
+  // Apply a preset template: fill refs + products + prompt with image chips
+  const applyPresetTemplate = useCallback((template: PresetTemplate) => {
+    // 1. Set ref images (style references + product images, max 5)
+    const allRefSrcs = [...template.refImages, ...template.defaultProducts.map(p => p.src)].slice(0, 10);
+    setUploadedRefs(allRefSrcs);
+    // 2. Build prompt with image chips
     const makeChip = (src: string, label: string) =>
       `<span contenteditable="false" class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[12px] font-medium align-middle mx-0.5" style="background:#f1f5f9;border:1px solid rgba(15,23,42,0.08);cursor:default;vertical-align:middle;"><img src="${src}" style="width:20px;height:20px;border-radius:4px;object-fit:cover;display:inline-block;" /> ${label}</span>`;
-    const html = template
-      .replace("{img1}", makeChip(newRefs[0] || item.src, "Image 1"))
-      .replace("{img2}", newRefs.length > 1 ? makeChip(newRefs[1], "Image 2") : makeChip(item.src, "Image 1"));
+    let html = template.prompt;
+    // Replace {ref} with first ref image chip
+    html = html.replace("{ref}", makeChip(template.refImages[0], "Style Ref"));
+    // Replace {product} with product chips
+    const productChips = template.defaultProducts.map(p => makeChip(p.src, p.label)).join(" ");
+    html = html.replace("{product}", productChips);
     if (promptRef.current) {
       promptRef.current.innerHTML = html;
     }
     setActivePopover(null);
-  }, [uploadedRefs]);
+  }, []);
 
   return (
     <div className="flex-1 h-full flex flex-col overflow-hidden" style={{ background: "#f4f6f9" }}>
@@ -527,18 +643,40 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
             {/* 1:1 image grid, max 4 per row */}
             <div className="grid grid-cols-4 gap-3 p-5">
               {task.images.slice(0, 4).map((img) => (
-                <button
+                <div
                   key={img.id}
-                  onClick={() => onImageClick(img.id)}
                   className="aspect-square rounded-xl overflow-hidden cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] group relative bg-[#f8fafc]"
+                  onClick={() => onImageClick(img.id, task.images)}
                 >
                   <img
                     src={img.src}
                     alt="Generated collage"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
-                </button>
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  {/* Hover action buttons */}
+                  <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center gap-1.5 pb-3 px-2 opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0">
+                    <div className="flex gap-1.5">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); }}
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-[#0f172a] cursor-pointer hover:bg-white transition-colors"
+                        style={{ background: "rgba(255,255,255,0.88)", backdropFilter: "blur(8px)" }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        Save
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); }}
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-[#0f172a] cursor-pointer hover:bg-white transition-colors"
+                        style={{ background: "rgba(255,255,255,0.88)", backdropFilter: "blur(8px)" }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Download
+                      </button>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -766,7 +904,7 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
             </ToolbarChip>
             {activePopover === "presets" && (
               <div
-                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[720px] max-h-[480px] rounded-2xl z-50 flex flex-col"
+                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[780px] max-h-[520px] rounded-2xl z-50 flex flex-col"
                 style={{
                   background: "#ffffff",
                   border: "1px solid rgba(15,23,42,0.08)",
@@ -779,7 +917,7 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f172a" strokeWidth="2">
                       <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
                     </svg>
-                    <span className="text-[15px] font-semibold text-[#0f172a]">Presets</span>
+                    <span className="text-[15px] font-semibold text-[#0f172a]">Preset Templates</span>
                   </div>
                   <button
                     onClick={() => setActivePopover(null)}
@@ -790,127 +928,112 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
                     </svg>
                   </button>
                 </div>
-                {/* Tabs */}
-                <div className="flex gap-1 px-5 py-3 flex-shrink-0">
-                  {["Collage", "My Presets"].map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => setPresetsTab(t.toLowerCase().replace(" ", "-"))}
-                      className={`px-4 py-2 rounded-lg text-[13px] font-medium transition-colors cursor-pointer ${
-                        presetsTab === t.toLowerCase().replace(" ", "-")
-                          ? "text-[#0f172a] bg-[#f1f5f9] font-semibold"
-                          : "text-[#64748b] hover:text-[#0f172a] hover:bg-[#f8fafc]"
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))}
+                {/* Filter dropdowns */}
+                <div className="flex gap-2 px-5 py-3 flex-shrink-0">
+                  <select value={presetStyleFilter} onChange={e => setPresetStyleFilter(e.target.value)}
+                    className="px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#0f172a] bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0a84ff]/20"
+                    style={{ border: "1px solid rgba(15,23,42,0.1)" }}>
+                    {presetStyles.map(s => <option key={s} value={s}>{s === "All" ? "All Styles" : s}</option>)}
+                  </select>
+                  <select value={presetSeasonFilter} onChange={e => setPresetSeasonFilter(e.target.value)}
+                    className="px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#0f172a] bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0a84ff]/20"
+                    style={{ border: "1px solid rgba(15,23,42,0.1)" }}>
+                    {presetSeasons.map(s => <option key={s} value={s}>{s === "All" ? "All Seasons" : s}</option>)}
+                  </select>
+                  <select value={presetBloggerFilter} onChange={e => setPresetBloggerFilter(e.target.value)}
+                    className="px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#0f172a] bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0a84ff]/20"
+                    style={{ border: "1px solid rgba(15,23,42,0.1)" }}>
+                    {presetBloggers.map(s => <option key={s} value={s}>{s === "All" ? "All Types" : s}</option>)}
+                  </select>
                 </div>
-                {/* Tab content */}
-                {presetsTab === "collage" ? (
-                  <>
-                    {/* Collage category tags */}
-                    <div className="flex gap-2 px-5 pb-3 flex-shrink-0 flex-wrap">
-                      {["All", "Western Fashion", "Daily", "Formal/Work Commute", "Vacation"].map((cat) => {
-                        const catKey = cat.toLowerCase();
-                        return (
-                          <button
-                            key={cat}
-                            onClick={() => setPresetCategory(catKey)}
-                            className={`px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors cursor-pointer ${
-                              presetCategory === catKey
-                                ? "text-[#0f172a] bg-[#0f172a]/8 font-semibold"
-                                : "text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9]"
-                            }`}
-                            style={{
-                              border: presetCategory === catKey ? "1px solid rgba(15,23,42,0.12)" : "1px solid rgba(15,23,42,0.06)",
-                            }}
-                          >
-                            {cat}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    {/* Collage grid */}
-                    <div className="flex-1 overflow-y-auto px-5 pb-5">
-                      {Object.entries(collagePresets)
-                        .filter(([key]) => presetCategory === "all" || key === presetCategory)
-                        .map(([category, items]) => (
-                          <div key={category} className="mb-5 last:mb-0">
-                            <h5 className="text-[12px] font-semibold text-[#64748b] uppercase tracking-wider mb-3">{category}</h5>
-                            <div className="grid grid-cols-5 gap-3">
-                              {items.map((item) => (
-                                <button
-                                  key={item.name}
-                                  onClick={() => applyPreset(item, category)}
-                                  onMouseEnter={(e) => showPreview(item.src, e)}
-                                  onMouseLeave={hidePreview}
-                                  className="group relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#0a84ff]/30 transition-all bg-[#f8fafc]"
-                                >
-                                  <img src={item.src} alt={item.name} className="w-full h-full object-cover" />
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                                  <span className="absolute bottom-2 left-2 right-2 text-[11px] font-semibold text-white leading-tight">
-                                    {item.name}
-                                  </span>
-                                </button>
-                              ))}
+                {/* Template cards grid */}
+                <div className="flex-1 overflow-y-auto px-5 pb-5">
+                  <div className="grid grid-cols-3 gap-4">
+                    {presetTemplates
+                      .filter(t => (presetStyleFilter === "All" || t.style === presetStyleFilter)
+                        && (presetSeasonFilter === "All" || t.season === presetSeasonFilter)
+                        && (presetBloggerFilter === "All" || t.blogger === presetBloggerFilter))
+                      .map(t => (
+                        <div key={t.id} className="rounded-xl overflow-hidden group cursor-pointer transition-all hover:shadow-lg"
+                          style={{ background: "#ffffff", border: "1px solid rgba(15,23,42,0.06)" }}
+                          onClick={() => setExpandedPreset(expandedPreset === t.id ? null : t.id)}>
+                          {/* Cover image */}
+                          <div className="relative aspect-[4/3] overflow-hidden">
+                            <img src={t.cover} alt={t.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                            {/* Tags */}
+                            <div className="absolute top-2 left-2 flex gap-1 flex-wrap">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold text-white/90" style={{ background: "rgba(99,102,241,0.7)", backdropFilter: "blur(4px)" }}>{t.style}</span>
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold text-white/90" style={{ background: "rgba(14,165,233,0.7)", backdropFilter: "blur(4px)" }}>{t.season}</span>
+                            </div>
+                            {/* Name overlay */}
+                            <div className="absolute bottom-2 left-3 right-3">
+                              <h4 className="text-[13px] font-bold text-white leading-tight">{t.name}</h4>
+                              <p className="text-[10px] text-white/70 mt-0.5">{t.blogger} Style</p>
                             </div>
                           </div>
-                        ))}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {/* My Presets category tags */}
-                    <div className="flex gap-2 px-5 pb-3 flex-shrink-0 flex-wrap">
-                      {myPresetsCategories.map((cat) => {
-                        const catKey = cat.toLowerCase();
-                        return (
-                          <button
-                            key={cat}
-                            onClick={() => setMyPresetsCategory(catKey)}
-                            className={`px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors cursor-pointer ${
-                              myPresetsCategory === catKey
-                                ? "text-[#0f172a] bg-[#0f172a]/8 font-semibold"
-                                : "text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9]"
-                            }`}
-                            style={{
-                              border: myPresetsCategory === catKey ? "1px solid rgba(15,23,42,0.12)" : "1px solid rgba(15,23,42,0.06)",
-                            }}
-                          >
-                            {cat}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    {/* My Presets product grid */}
-                    <div className="flex-1 overflow-y-auto px-5 pb-5">
-                      {Object.entries(myPresetsData)
-                        .filter(([key]) => myPresetsCategory === "all" || key === myPresetsCategory)
-                        .map(([category, items]) => (
-                          <div key={category} className="mb-5 last:mb-0">
-                            <h5 className="text-[12px] font-semibold text-[#64748b] uppercase tracking-wider mb-3">{category}</h5>
-                            <div className="grid grid-cols-7 gap-3">
-                              {items.map((item) => (
+                          {/* Expanded detail */}
+                          {expandedPreset === t.id && (
+                            <div className="px-3 py-3" style={{ borderTop: "1px solid rgba(15,23,42,0.06)" }}>
+                              {/* Ref images */}
+                              <div className="mb-2">
+                                <span className="text-[10px] font-semibold text-[#64748b] uppercase tracking-wider">Style References</span>
+                                <div className="flex gap-1.5 mt-1">
+                                  {t.refImages.map((src, i) => (
+                                    <div key={i} className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0"
+                                      onMouseEnter={(e) => showPreview(src, e)} onMouseLeave={hidePreview}>
+                                      <img src={src} alt="" className="w-full h-full object-cover" />
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              {/* Default products */}
+                              <div className="mb-2">
+                                <span className="text-[10px] font-semibold text-[#64748b] uppercase tracking-wider">Default Products</span>
+                                <div className="flex gap-1.5 mt-1">
+                                  {t.defaultProducts.map((p, i) => (
+                                    <div key={i} className="flex flex-col items-center gap-0.5">
+                                      <div className="w-10 h-10 rounded-lg overflow-hidden border border-dashed"
+                                        style={{ borderColor: "rgba(15,23,42,0.15)" }}
+                                        onMouseEnter={(e) => showPreview(p.src, e)} onMouseLeave={hidePreview}>
+                                        <img src={p.src} alt={p.label} className="w-full h-full object-cover" />
+                                      </div>
+                                      <span className="text-[9px] text-[#94a3b8] leading-tight text-center">{p.label}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              {/* Prompt preview */}
+                              <div className="mb-3">
+                                <span className="text-[10px] font-semibold text-[#64748b] uppercase tracking-wider">Prompt</span>
+                                <p className="text-[11px] text-[#475569] mt-1 leading-relaxed line-clamp-3">{t.prompt.replace("{ref}", "[Style Ref]").replace("{product}", "[Products]")}</p>
+                              </div>
+                              {/* Action buttons */}
+                              <div className="flex gap-2">
                                 <button
-                                  key={item.name}
-                                  onMouseEnter={(e) => showPreview(item.src, e)}
-                                  onMouseLeave={hidePreview}
-                                  className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#0a84ff]/30 transition-all bg-[#f8fafc]"
-                                >
-                                  <img src={item.src} alt={item.name} className="w-full h-full object-cover" />
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                  <span className="absolute bottom-1.5 left-1.5 right-1.5 text-[10px] font-semibold text-white leading-tight opacity-0 group-hover:opacity-100 transition-opacity">
-                                    {item.name}
-                                  </span>
+                                  onClick={(e) => { e.stopPropagation(); applyPresetTemplate(t); }}
+                                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-semibold text-white cursor-pointer hover:opacity-90 transition-opacity"
+                                  style={{ background: "linear-gradient(135deg, #6366f1, #0ea5e9)" }}>
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                  Use Template
                                 </button>
-                              ))}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                  {presetTemplates.filter(t => (presetStyleFilter === "All" || t.style === presetStyleFilter)
+                    && (presetSeasonFilter === "All" || t.season === presetSeasonFilter)
+                    && (presetBloggerFilter === "All" || t.blogger === presetBloggerFilter)).length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-12 text-[#94a3b8]">
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                      </svg>
+                      <span className="text-[13px] mt-2">No templates match your filters</span>
                     </div>
-                  </>
-                )}
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -967,7 +1090,7 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
                 <span className="text-[15px] font-semibold text-[#0f172a]">Select Reference</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-[13px] text-[#94a3b8]">{uploadedRefs.length}/5</span>
+                <span className="text-[13px] text-[#94a3b8]">{uploadedRefs.length}/10</span>
                 <button
                   onClick={() => setShowRefModal(false)}
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94a3b8] hover:text-[#0f172a] hover:bg-[#f1f5f9] transition-colors cursor-pointer"
@@ -1002,6 +1125,7 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
                     { id: "upload", icon: "upload", label: "Upload Assets" },
                     { id: "product", icon: "product", label: "Products" },
                     { id: "style", icon: "sparkle", label: "Style Select" },
+                    { id: "model", icon: "model", label: "Models" },
                   ].map((tab) => (
                     <button
                       key={tab.id}
@@ -1061,7 +1185,7 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
                                 <button
                                   key={item.name}
                                   onClick={() => {
-                                    if (uploadedRefs.length < 5 && !uploadedRefs.includes(item.src)) {
+                                    if (uploadedRefs.length < 10 && !uploadedRefs.includes(item.src)) {
                                       setUploadedRefs([...uploadedRefs, item.src]);
                                     }
                                   }}
@@ -1227,7 +1351,7 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
                           <button
                             key={item.src}
                             onClick={() => {
-                              if (uploadedRefs.length < 5 && !uploadedRefs.includes(item.src)) {
+                              if (uploadedRefs.length < 10 && !uploadedRefs.includes(item.src)) {
                                 setUploadedRefs([...uploadedRefs, item.src]);
                               }
                             }}
@@ -1280,6 +1404,61 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
                           );
                         });
                       })()}
+                    </div>
+                  )}
+                  {refModalTab === "model" && (
+                    <div className="flex flex-col gap-3">
+                      {/* Model category tags */}
+                      <div className="flex gap-2 flex-wrap">
+                        {modelCategories.map((cat) => (
+                          <button
+                            key={cat}
+                            onClick={() => setModelFilterCat(cat)}
+                            className={`px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors cursor-pointer ${
+                              modelFilterCat === cat
+                                ? "text-[#0f172a] bg-[#0f172a]/8 font-semibold"
+                                : "text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9]"
+                            }`}
+                            style={{ border: modelFilterCat === cat ? "1px solid rgba(15,23,42,0.12)" : "1px solid rgba(15,23,42,0.06)" }}
+                          >
+                            {cat}
+                          </button>
+                        ))}
+                      </div>
+                      {/* Model images grouped by name */}
+                      {Object.entries(modelRefImages)
+                        .filter(([key]) => modelFilterCat === "All" || key === modelFilterCat)
+                        .map(([modelName, items]) => (
+                          <div key={modelName}>
+                            <h5 className="text-[12px] font-semibold text-[#64748b] uppercase tracking-wider mb-2">{modelName}</h5>
+                            <div className="grid grid-cols-6 gap-2">
+                              {items.map((item) => (
+                                <button
+                                  key={item.src}
+                                  onClick={() => {
+                                    if (uploadedRefs.length < 10 && !uploadedRefs.includes(item.src)) {
+                                      setUploadedRefs([...uploadedRefs, item.src]);
+                                    }
+                                  }}
+                                  onMouseEnter={(e) => showPreview(item.src, e)}
+                                  onMouseLeave={hidePreview}
+                                  className={`group relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer transition-all ${
+                                    uploadedRefs.includes(item.src) ? "ring-2 ring-[#0a84ff]" : "hover:ring-2 hover:ring-[#0a84ff]/30"
+                                  }`}
+                                >
+                                  <img src={item.src} alt={item.name} className="w-full h-full object-cover" />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                  <span className="absolute bottom-1.5 left-1.5 right-1.5 text-[10px] font-semibold text-white leading-tight opacity-0 group-hover:opacity-100 transition-opacity">{item.name}</span>
+                                  {uploadedRefs.includes(item.src) && (
+                                    <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-[#0a84ff] flex items-center justify-center">
+                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                                    </div>
+                                  )}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
                     </div>
                   )}
                 </div>
@@ -1398,6 +1577,7 @@ function RefTabIcon({ name }: { name: string }) {
     case "upload": return <svg {...props}><rect x="3" y="3" width="18" height="18" rx="3" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>;
     case "sparkle": return <svg {...props}><path d="M12 2L9 9l-7 1 5 5-1.5 7L12 18.5 18.5 22 17 15l5-5-7-1z" /></svg>;
     case "product": return <svg {...props}><rect x="2" y="7" width="20" height="15" rx="2" /><polyline points="16 7 12 2 8 7" /></svg>;
+    case "model": return <svg {...props}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>;
     default: return null;
   }
 }

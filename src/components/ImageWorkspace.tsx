@@ -11,7 +11,7 @@ const tabs = [
 ];
 
 interface ImageWorkspaceProps {
-  onImageClick: (imageId: string) => void;
+  onImageClick: (imageId: string, taskImages?: { id: string; src: string }[]) => void;
 }
 
 export default function ImageWorkspace({ onImageClick }: ImageWorkspaceProps) {

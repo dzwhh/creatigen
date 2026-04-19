@@ -419,6 +419,13 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
   const [digitalModelFilter, setDigitalModelFilter] = useState("All");
   const [productStyleFilter, setProductStyleFilter] = useState("All");
   const [productCatFilter, setProductCatFilter] = useState("All");
+  const [filterDropdown, setFilterDropdown] = useState<string | null>(null);
+  const [filterModel, setFilterModel] = useState<string | null>(null);
+  const [filterRes, setFilterRes] = useState<string | null>(null);
+  const [filterRatio, setFilterRatio] = useState<string | null>(null);
+  const [batchMode, setBatchMode] = useState(false);
+  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
+  const filterBarRef = useRef<HTMLDivElement>(null);
   const [aiComboResults, setAiComboResults] = useState<Record<string, { slot: string; item: { name: string; src: string; category: string } }[]> | null>(null);
   const [selectedModel, setSelectedModel] = useState("wanxiang-2.7");
   const [uploadedRefs, setUploadedRefs] = useState<string[]>([]);
@@ -469,12 +476,15 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
       ) {
         setShowRefModal(false);
       }
+      if (filterBarRef.current && !filterBarRef.current.contains(e.target as Node)) {
+        setFilterDropdown(null);
+      }
     };
-    if (activePopover || showRefModal) {
+    if (activePopover || showRefModal || filterDropdown) {
       document.addEventListener("mousedown", handleClickOutside);
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [activePopover, showRefModal]);
+  }, [activePopover, showRefModal, filterDropdown]);
 
   const togglePopover = (name: string) => {
     setActivePopover((prev) => (prev === name ? null : name));
@@ -592,52 +602,165 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
   return (
     <div className="flex-1 h-full flex flex-col overflow-hidden" style={{ background: "#f4f6f9" }}>
       {/* Filter bar */}
-      <div
-        className="flex items-center gap-3 px-6 py-3 flex-shrink-0"
-        style={{
-          background: "#ffffff",
-          borderBottom: "1px solid rgba(15,23,42,0.06)",
-        }}
-      >
-        {["Model", "Resolution", "Aspect Ratio"].map((filter) => (
-          <button
-            key={filter}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-medium text-[#0f172a] cursor-pointer hover:bg-[#f1f5f9] transition-colors"
-            style={{ border: "1px solid rgba(15,23,42,0.1)" }}
-          >
-            {filter}
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </button>
-        ))}
-        <div className="flex-1 relative">
-          <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2"
-            width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search prompts..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl text-[13px] text-[#0f172a] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#0a84ff]/20"
-            style={{ border: "1px solid rgba(15,23,42,0.1)" }}
-          />
-        </div>
-        <button
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-medium text-[#0f172a] cursor-pointer hover:bg-[#f1f5f9] transition-colors"
-          style={{ border: "1px solid rgba(15,23,42,0.1)" }}
+      <div ref={filterBarRef}>
+        <div
+          className="flex items-center gap-3 px-6 py-3 flex-shrink-0"
+          style={{
+            background: "#ffffff",
+            borderBottom: batchMode ? "none" : "1px solid rgba(15,23,42,0.06)",
+          }}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="3" y="3" width="7" height="7" rx="1" />
-            <rect x="14" y="3" width="7" height="7" rx="1" />
-            <rect x="3" y="14" width="7" height="7" rx="1" />
-            <rect x="14" y="14" width="7" height="7" rx="1" />
-          </svg>
-          Batch
-        </button>
+          {/* Model filter dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setFilterDropdown(filterDropdown === "model" ? null : "model")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-medium cursor-pointer hover:bg-[#f1f5f9] transition-colors ${
+                filterModel ? "text-[#0a84ff]" : "text-[#0f172a]"
+              }`}
+              style={{ border: filterModel ? "1px solid rgba(10,132,255,0.3)" : "1px solid rgba(15,23,42,0.1)" }}
+            >
+              {filterModel || "Model"}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            {filterDropdown === "model" && (
+              <div className="absolute top-full left-0 mt-1.5 w-[220px] rounded-xl py-1.5 z-50"
+                style={{ background: "#ffffff", border: "1px solid rgba(15,23,42,0.08)", boxShadow: "0 8px 32px rgba(15,23,42,0.12)" }}>
+                {["Seedream 5.0 Lite", "Seedream 4.5", "Nano Banana 2", "Nano Banana Pro"].map((m) => (
+                  <button key={m}
+                    onClick={() => { setFilterModel(filterModel === m ? null : m); setFilterDropdown(null); }}
+                    className={`w-full text-left px-4 py-2.5 text-[13px] font-medium cursor-pointer transition-colors ${
+                      filterModel === m ? "text-[#0a84ff] bg-[#f0f7ff]" : "text-[#0f172a] hover:bg-[#f8fafc]"
+                    }`}>
+                    {m}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* Resolution filter dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setFilterDropdown(filterDropdown === "resolution" ? null : "resolution")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-medium cursor-pointer hover:bg-[#f1f5f9] transition-colors ${
+                filterRes ? "text-[#0a84ff]" : "text-[#0f172a]"
+              }`}
+              style={{ border: filterRes ? "1px solid rgba(10,132,255,0.3)" : "1px solid rgba(15,23,42,0.1)" }}
+            >
+              {filterRes ? `Resolution ${filterRes}` : "Resolution"}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            {filterDropdown === "resolution" && (
+              <div className="absolute top-full left-0 mt-1.5 w-[140px] rounded-xl py-1.5 z-50"
+                style={{ background: "#ffffff", border: "1px solid rgba(15,23,42,0.08)", boxShadow: "0 8px 32px rgba(15,23,42,0.12)" }}>
+                {["1K", "2K", "4K"].map((r) => (
+                  <button key={r}
+                    onClick={() => { setFilterRes(filterRes === r ? null : r); setFilterDropdown(null); }}
+                    className={`w-full text-left px-4 py-2.5 text-[13px] font-medium cursor-pointer transition-colors ${
+                      filterRes === r ? "text-[#0a84ff] bg-[#f0f7ff]" : "text-[#0f172a] hover:bg-[#f8fafc]"
+                    }`}>
+                    {r}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* Aspect Ratio filter dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setFilterDropdown(filterDropdown === "ratio" ? null : "ratio")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-medium cursor-pointer hover:bg-[#f1f5f9] transition-colors ${
+                filterRatio ? "text-[#0a84ff]" : "text-[#0f172a]"
+              }`}
+              style={{ border: filterRatio ? "1px solid rgba(10,132,255,0.3)" : "1px solid rgba(15,23,42,0.1)" }}
+            >
+              {filterRatio ? `Aspect Ratio ${filterRatio}` : "Aspect Ratio"}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            {filterDropdown === "ratio" && (
+              <div className="absolute top-full left-0 mt-1.5 w-[140px] rounded-xl py-1.5 z-50"
+                style={{ background: "#ffffff", border: "1px solid rgba(15,23,42,0.08)", boxShadow: "0 8px 32px rgba(15,23,42,0.12)" }}>
+                {["1:1", "3:4", "4:3", "9:16", "16:9", "21:9"].map((r) => (
+                  <button key={r}
+                    onClick={() => { setFilterRatio(filterRatio === r ? null : r); setFilterDropdown(null); }}
+                    className={`w-full text-left px-4 py-2.5 text-[13px] font-medium cursor-pointer transition-colors ${
+                      filterRatio === r ? "text-[#0a84ff] bg-[#f0f7ff]" : "text-[#0f172a] hover:bg-[#f8fafc]"
+                    }`}>
+                    {r}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* Search */}
+          <div className="flex-1 relative">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text" placeholder="Search prompts..."
+              className="w-full pl-10 pr-4 py-2 rounded-xl text-[13px] text-[#0f172a] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#0a84ff]/20"
+              style={{ border: "1px solid rgba(15,23,42,0.1)" }}
+            />
+          </div>
+          {/* Batch toggle */}
+          <button
+            onClick={() => { setBatchMode(!batchMode); if (batchMode) setSelectedTaskIds(new Set()); }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-medium cursor-pointer transition-colors ${
+              batchMode ? "text-[#0a84ff] bg-[#f0f7ff]" : "text-[#0f172a] hover:bg-[#f1f5f9]"
+            }`}
+            style={{ border: batchMode ? "1px solid rgba(10,132,255,0.3)" : "1px solid rgba(15,23,42,0.1)" }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            Batch
+          </button>
+        </div>
+        {/* Batch action bar */}
+        {batchMode && (
+          <div
+            className="flex items-center gap-3 px-6 py-2.5 flex-shrink-0"
+            style={{ background: "#fafafa", borderBottom: "1px solid rgba(15,23,42,0.06)" }}
+          >
+            <span className="text-[13px] text-[#64748b] flex-1">
+              <span className="font-semibold text-[#0f172a]">{selectedTaskIds.size} selected</span>
+              {" "}{selectedTaskIds.size}/{selectedTaskIds.size} downloadable
+            </span>
+            <button
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[12px] font-semibold text-white cursor-pointer hover:opacity-90 transition-opacity"
+              style={{ background: "#0f172a" }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </button>
+            <button
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[12px] font-semibold text-white cursor-pointer hover:opacity-90 transition-opacity"
+              style={{ background: "#ef4444" }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              Delete
+            </button>
+            <button
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#64748b] cursor-pointer hover:text-[#0f172a] hover:bg-[#f1f5f9] transition-colors"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M5 6l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-14"/></svg>
+              Clean Failed
+            </button>
+            <button
+              onClick={() => { setBatchMode(false); setSelectedTaskIds(new Set()); }}
+              className="px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#64748b] cursor-pointer hover:text-[#0f172a] hover:bg-[#f1f5f9] transition-colors"
+            >
+              Exit
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Task list */}
@@ -645,11 +768,21 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
         {mockTasks.map((task) => (
           <div
             key={task.id}
-            className="rounded-2xl overflow-hidden"
+            className={`rounded-2xl overflow-hidden transition-all ${batchMode ? "cursor-pointer" : ""}`}
             style={{
               background: "#ffffff",
-              border: "1px solid rgba(15,23,42,0.06)",
-              boxShadow: "0 1px 2px rgba(15,23,42,0.04)",
+              border: batchMode && selectedTaskIds.has(task.id) ? "2px solid #0f172a" : "1px solid rgba(15,23,42,0.06)",
+              boxShadow: batchMode && selectedTaskIds.has(task.id) ? "0 2px 8px rgba(15,23,42,0.12)" : "0 1px 2px rgba(15,23,42,0.04)",
+            }}
+            onClick={() => {
+              if (batchMode) {
+                setSelectedTaskIds((prev) => {
+                  const next = new Set(prev);
+                  if (next.has(task.id)) next.delete(task.id);
+                  else next.add(task.id);
+                  return next;
+                });
+              }
             }}
           >
             {/* Meta params row */}
@@ -668,6 +801,22 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
               >
                 {task.meta.status}
               </Badge>
+              {/* Batch checkbox */}
+              {batchMode && (
+                <div
+                  className="ml-auto w-6 h-6 rounded-full flex items-center justify-center transition-all flex-shrink-0"
+                  style={{
+                    border: selectedTaskIds.has(task.id) ? "none" : "2px solid rgba(15,23,42,0.2)",
+                    background: selectedTaskIds.has(task.id) ? "#0f172a" : "transparent",
+                  }}
+                >
+                  {selectedTaskIds.has(task.id) && (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </div>
+              )}
             </div>
             {/* 1:1 image grid, max 4 per row */}
             <div className="grid grid-cols-4 gap-3 p-5">
@@ -675,7 +824,7 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
                 <div
                   key={img.id}
                   className="aspect-square rounded-xl overflow-hidden cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] group relative bg-[#f8fafc]"
-                  onClick={() => onImageClick(img.id, task.images)}
+                  onClick={(e) => { if (batchMode) { e.stopPropagation(); return; } onImageClick(img.id, task.images); }}
                 >
                   <img
                     src={img.src}

@@ -107,6 +107,34 @@ const modelRefImages: Record<string, { name: string; src: string }[]> = {
 };
 const modelCategories = ["All", ...Object.keys(modelRefImages)];
 
+// Digital Model library (white-background European/American digital models)
+const digitalModelImages: Record<string, { id: string; name: string; src: string }[]> = {
+  Female: [
+    { id: "dm-f-01", name: "Sophia", src: "/img/models/female_001.png" },
+    { id: "dm-f-02", name: "Isabella", src: "/img/models/female_002.png" },
+    { id: "dm-f-03", name: "Olivia", src: "/img/models/female_003.png" },
+    { id: "dm-f-04", name: "Emma", src: "/img/models/female_004.png" },
+    { id: "dm-f-05", name: "Ava", src: "/img/models/female_005.png" },
+    { id: "dm-f-06", name: "Charlotte", src: "/img/models/female_006.png" },
+    { id: "dm-f-07", name: "Mia", src: "/img/models/female_007.png" },
+    { id: "dm-f-08", name: "Amelia", src: "/img/models/female_008.png" },
+    { id: "dm-f-09", name: "Harper", src: "/img/models/female_009.png" },
+    { id: "dm-f-10", name: "Evelyn", src: "/img/models/female_010.png" },
+    { id: "dm-f-11", name: "Luna", src: "/img/models/female_011.png" },
+    { id: "dm-f-12", name: "Chloe", src: "/img/models/female_012.png" },
+  ],
+  Male: [
+    { id: "dm-m-01", name: "Liam", src: "/img/models/male_001.png" },
+    { id: "dm-m-02", name: "Noah", src: "/img/models/male_002.png" },
+    { id: "dm-m-03", name: "Oliver", src: "/img/models/male_003.png" },
+    { id: "dm-m-04", name: "James", src: "/img/models/male_004.png" },
+    { id: "dm-m-05", name: "Ethan", src: "/img/models/male_005.png" },
+    { id: "dm-m-06", name: "Lucas", src: "/img/models/male_006.png" },
+    { id: "dm-m-07", name: "Mason", src: "/img/models/male_007.png" },
+    { id: "dm-m-08", name: "Logan", src: "/img/models/male_008.png" },
+  ],
+};
+
 // Product images by style category (from img/products subfolders)
 const productRefImages: Record<string, { name: string; src: string; category: string }[]> = {
   "Western Fashion": [
@@ -388,6 +416,7 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
   const [refModalTab, setRefModalTab] = useState("upload");
   const [styleFilterCat, setStyleFilterCat] = useState("All");
   const [modelFilterCat, setModelFilterCat] = useState("All");
+  const [digitalModelFilter, setDigitalModelFilter] = useState("All");
   const [productStyleFilter, setProductStyleFilter] = useState("All");
   const [productCatFilter, setProductCatFilter] = useState("All");
   const [aiComboResults, setAiComboResults] = useState<Record<string, { slot: string; item: { name: string; src: string; category: string } }[]> | null>(null);
@@ -1124,8 +1153,9 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
                   {[
                     { id: "upload", icon: "upload", label: "Upload Assets" },
                     { id: "product", icon: "product", label: "Products" },
-                    { id: "style", icon: "sparkle", label: "Style Select" },
-                    { id: "model", icon: "model", label: "Models" },
+                    { id: "style", icon: "sparkle", label: "Trending Style" },
+                    { id: "model", icon: "model", label: "Creators" },
+                    { id: "digitalModel", icon: "digitalModel", label: "Models" },
                   ].map((tab) => (
                     <button
                       key={tab.id}
@@ -1461,6 +1491,63 @@ export default function AmazonProductSet({ onImageClick }: AmazonProductSetProps
                         ))}
                     </div>
                   )}
+                  {refModalTab === "digitalModel" && (
+                    <div className="flex flex-col gap-3">
+                      {/* Digital model category tags */}
+                      <div className="flex gap-2 flex-wrap">
+                        {["All", "Female", "Male"].map((cat) => (
+                          <button
+                            key={cat}
+                            onClick={() => setDigitalModelFilter(cat)}
+                            className={`px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors cursor-pointer ${
+                              digitalModelFilter === cat
+                                ? "text-[#0f172a] bg-[#0f172a]/8 font-semibold"
+                                : "text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9]"
+                            }`}
+                            style={{ border: digitalModelFilter === cat ? "1px solid rgba(15,23,42,0.12)" : "1px solid rgba(15,23,42,0.06)" }}
+                          >
+                            {cat}
+                          </button>
+                        ))}
+                      </div>
+                      {/* Digital model grid */}
+                      {Object.entries(digitalModelImages)
+                        .filter(([key]) => digitalModelFilter === "All" || key === digitalModelFilter)
+                        .map(([group, items]) => (
+                          <div key={group}>
+                            <h5 className="text-[12px] font-semibold text-[#64748b] uppercase tracking-wider mb-2">{group}</h5>
+                            <div className="grid grid-cols-6 gap-2">
+                              {items.map((item) => (
+                                <button
+                                  key={item.id}
+                                  onClick={() => {
+                                    if (uploadedRefs.length < 10 && !uploadedRefs.includes(item.src)) {
+                                      setUploadedRefs([...uploadedRefs, item.src]);
+                                    }
+                                  }}
+                                  className={`group relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer transition-all ${
+                                    uploadedRefs.includes(item.src) ? "ring-2 ring-[#0a84ff]" : "hover:ring-2 hover:ring-[#0a84ff]/30"
+                                  }`}
+                                >
+                                  {/* Placeholder: white-bg digital model */}
+                                  <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: "#f1f5f9" }}>
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.2">
+                                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+                                    </svg>
+                                    <span className="text-[9px] text-[#94a3b8] mt-1 font-medium">{item.name}</span>
+                                  </div>
+                                  {uploadedRefs.includes(item.src) && (
+                                    <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-[#0a84ff] flex items-center justify-center">
+                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                                    </div>
+                                  )}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1578,6 +1665,7 @@ function RefTabIcon({ name }: { name: string }) {
     case "sparkle": return <svg {...props}><path d="M12 2L9 9l-7 1 5 5-1.5 7L12 18.5 18.5 22 17 15l5-5-7-1z" /></svg>;
     case "product": return <svg {...props}><rect x="2" y="7" width="20" height="15" rx="2" /><polyline points="16 7 12 2 8 7" /></svg>;
     case "model": return <svg {...props}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>;
+    case "digitalModel": return <svg {...props}><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M16 16v-2a3 3 0 0 0-3-3h-2a3 3 0 0 0-3 3v2" /><circle cx="12" cy="7.5" r="2.5" /></svg>;
     default: return null;
   }
 }

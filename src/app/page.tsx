@@ -5,17 +5,20 @@ import PrimarySidebar from "@/components/PrimarySidebar";
 import SecondarySidebar from "@/components/SecondarySidebar";
 import ImageWorkspace from "@/components/ImageWorkspace";
 import ImageDetail from "@/components/ImageDetail";
+import PublishWorkspace from "@/components/PublishWorkspace";
+import AssetsWorkspace from "@/components/AssetsWorkspace";
 
 export default function Home() {
   const [activeItem, setActiveItem] = useState("creation");
   const [activeSubItem, setActiveSubItem] = useState("image");
+  const [publishSubItem, setPublishSubItem] = useState("instagram");
   const [secondarySidebarOpen, setSecondarySidebarOpen] = useState(true);
   const [detailImageId, setDetailImageId] = useState<string | null>(null);
   const [detailTaskImages, setDetailTaskImages] = useState<{ id: string; src: string }[]>([]);
 
   const handlePrimaryItemClick = (item: string) => {
     setActiveItem(item);
-    if (item === "creation") {
+    if (item === "creation" || item === "publish") {
       setSecondarySidebarOpen(true);
     } else {
       setSecondarySidebarOpen(false);
@@ -44,16 +47,32 @@ export default function Home() {
       <PrimarySidebar activeItem={activeItem} onItemClick={handlePrimaryItemClick} />
 
       {/* Secondary Sidebar */}
-      <SecondarySidebar
-        isOpen={secondarySidebarOpen && activeItem === "creation"}
-        activeSubItem={activeSubItem}
-        onSubItemClick={setActiveSubItem}
-        onCollapse={() => setSecondarySidebarOpen(false)}
-      />
+      {activeItem === "creation" && (
+        <SecondarySidebar
+          isOpen={secondarySidebarOpen}
+          activeSubItem={activeSubItem}
+          onSubItemClick={setActiveSubItem}
+          onCollapse={() => setSecondarySidebarOpen(false)}
+          sectionTitle="Creation"
+        />
+      )}
+      {activeItem === "publish" && (
+        <SecondarySidebar
+          isOpen={secondarySidebarOpen}
+          activeSubItem={publishSubItem}
+          onSubItemClick={setPublishSubItem}
+          onCollapse={() => setSecondarySidebarOpen(false)}
+          sectionTitle="Publish"
+        />
+      )}
 
       {/* Main Content */}
       <main className="flex-1 flex h-full overflow-hidden">
-        {activeItem === "creation" && activeSubItem === "image" ? (
+        {activeItem === "publish" ? (
+          <PublishWorkspace />
+        ) : activeItem === "assets" ? (
+          <AssetsWorkspace />
+        ) : activeItem === "creation" && activeSubItem === "image" ? (
           renderImageContent()
         ) : (
           <div className="flex-1 flex items-center justify-center" style={{ background: "#f4f6f9" }}>

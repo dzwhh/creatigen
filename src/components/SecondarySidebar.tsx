@@ -9,6 +9,7 @@ interface SecondarySidebarProps {
   activeSubItem: string;
   onSubItemClick: (item: string) => void;
   onCollapse: () => void;
+  sectionTitle?: string;
 }
 
 const subMenuItems = [
@@ -45,12 +46,46 @@ const subMenuItems = [
   },
 ];
 
+const publishSubMenuItems = [
+  {
+    id: "instagram",
+    label: "Instagram",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+        <circle cx="12" cy="12" r="5" />
+        <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
+  {
+    id: "facebook",
+    label: "Facebook",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+      </svg>
+    ),
+  },
+  {
+    id: "tiktok",
+    label: "TikTok",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+      </svg>
+    ),
+  },
+];
+
 export default function SecondarySidebar({
   isOpen,
   activeSubItem,
   onSubItemClick,
   onCollapse,
+  sectionTitle = "Creation",
 }: SecondarySidebarProps) {
+  const items = sectionTitle === "Publish" ? publishSubMenuItems : subMenuItems;
   return (
     <div
       className={`
@@ -97,7 +132,7 @@ export default function SecondarySidebar({
 
         {/* Section Title */}
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-1" style={{ color: "#64748b" }}>
-          Creation
+          {sectionTitle}
         </h2>
       </div>
 
@@ -105,7 +140,7 @@ export default function SecondarySidebar({
 
       {/* Sub Menu */}
       <nav className="flex-1 px-3 pt-3">
-        {subMenuItems.map((item) => {
+        {items.map((item) => {
           const isActive = activeSubItem === item.id;
           return (
             <button
